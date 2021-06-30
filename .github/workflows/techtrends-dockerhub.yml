@@ -1,7 +1,3 @@
-## MOVE THIS FILE to `.github/workflows/docker-build.yaml` TO EXECUTE IT
-
-# This is a basic workflow to help you get started with Actions
-
 name: TechTrends - Package with Docker
 
 # Controls when the action will run. Triggers the workflow on push or pull request
@@ -9,8 +5,15 @@ name: TechTrends - Package with Docker
 on:
   push:
     branches: [ main ]
+    # Prevent trigger build by change on other location
+    paths:
+      - 'project/techtrends/**'
+      - 'project/Dockerfile'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'project/techtrends/**'
+      - 'project/Dockerfile'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
