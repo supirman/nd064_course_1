@@ -7,10 +7,10 @@ from os import sys
 
 # Function to get a database connection.
 # This function connects to database with the name `database.db`
-def get_db_connection():
+def get_db_connection(count=True):
     connection = sqlite3.connect('database.db')
     connection.row_factory = sqlite3.Row
-    increment_connection_count(connection)
+    if count: increment_connection_count(connection)
     return connection
 
 
@@ -80,13 +80,24 @@ def create():
 
 @app.route('/healthz')
 def healthcheck():
-    response = app.response_class(
-            response=json.dumps({"result":"OK - healthy"}),
-            status=200,
-            mimetype='application/json'
-    )
-
-    app.logger.info('Status request successfull')
+    connection = get_db_connection(False)
+    # check posts table if exist https://stackoverflow.com/a/1604121/773307
+    result = connection.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='posts'").fetchone()
+    if result:
+        response = app.response_class(
+                response=json.dumps({"result":"OK - healthy"}),
+                status=200,
+                mimetype='application/json'
+        )
+        app.logger.info('Status request successfull')
+    else:
+        response = app.response_class(
+                response=json.dumps({"result":"ERROR - unhealthy"}),
+                status=500,
+                mimetype='application/json'
+        ) 
+        app.logger.error('Database connection error')
+    
     return response
 
 @app.route('/metrics')
