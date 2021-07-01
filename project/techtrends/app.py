@@ -3,6 +3,7 @@ import sqlite3
 from flask import Flask, jsonify, json, render_template, request, url_for, redirect, flash
 from werkzeug.exceptions import abort
 import logging
+from os import sys
 
 # Function to get a database connection.
 # This function connects to database with the name `database.db`
@@ -44,7 +45,7 @@ def index():
 def post(post_id):
     post = get_post(post_id)
     if post is None:
-        app.logger.info('A non-existing article is accessed and a 404 page returned')
+        app.logger.error('A non-existing article is accessed and a 404 page returned')
         return render_template('404.html'), 404
     else:
         app.logger.info('Article "{}" retrieved!'.format(post['title']))
@@ -112,5 +113,13 @@ def metrics():
 
 # start the application on port 3111
 if __name__ == "__main__":
+    logger = logging.getLogger("__name__")
     logging.basicConfig(format='%(levelname)s:%(name)s:%(asctime)s, %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d, %H:%M:%S')
+    # Got some clearence from mentor answer https://knowledge.udacity.com/questions/612353
+    h1 = logging.StreamHandler(sys.stdout)
+    h1.setLevel(logging.DEBUG)
+    h2 = logging.StreamHandler(sys.stderr)
+    h2.setLevel(logging.ERROR)
+    logger.addHandler(h1)
+    logger.addHandler(h2)
     app.run(host='0.0.0.0', port='3111')
