@@ -125,12 +125,13 @@ def metrics():
 # start the application on port 3111
 if __name__ == "__main__":
     logger = logging.getLogger("__name__")
-    logging.basicConfig(format='%(levelname)s:%(name)s:%(asctime)s, %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d, %H:%M:%S')
-    # Got some clearence from mentor answer https://knowledge.udacity.com/questions/612353
-    h1 = logging.StreamHandler(sys.stdout)
-    h1.setLevel(logging.DEBUG)
-    h2 = logging.StreamHandler(sys.stderr)
-    h2.setLevel(logging.ERROR)
-    logger.addHandler(h1)
-    logger.addHandler(h2)
+    
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setLevel(logging.DEBUG)
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setLevel(logging.ERROR)
+
+    handlers = [stderr_handler, stdout_handler]
+
+    logging.basicConfig(format='%(levelname)s:%(name)s:%(asctime)s, %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d, %H:%M:%S', handlers=handlers)
     app.run(host='0.0.0.0', port='3111')
